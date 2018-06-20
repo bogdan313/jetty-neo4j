@@ -5,6 +5,9 @@ import com.google.gson.annotations.Expose;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Helper class for return information about error to client
+ */
 public class ErrorMessage {
     @Expose
     private String message;

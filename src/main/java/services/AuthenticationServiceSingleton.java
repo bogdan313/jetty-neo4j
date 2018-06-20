@@ -2,9 +2,12 @@ package services;
 
 import com.sun.istack.internal.NotNull;
 import database.domains.Person;
-
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Service for storing authenticated users
+ * Should be helpful for RBAC (Role Based Access Control)
+ */
 public class AuthenticationServiceSingleton {
     private final static AuthenticationServiceSingleton authenticationServiceSingleton = new AuthenticationServiceSingleton();
     private final ConcurrentHashMap<String, Person> authenticatedPersons = new ConcurrentHashMap<>();
@@ -24,6 +27,7 @@ public class AuthenticationServiceSingleton {
     }
 
     boolean signInPerson(@NotNull String sessionId, @NotNull Person person) {
+        //TODO: Implement check for this Person is already authenticated
         if (sessionId.trim().isEmpty()) return false;
 
         this.authenticatedPersons.put(sessionId, person);

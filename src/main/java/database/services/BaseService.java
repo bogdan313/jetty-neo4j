@@ -252,7 +252,7 @@ public class BaseService<T extends Domain> {
     }
 
     public boolean delete(@NotNull T object) {
-        if (object.availableDelete(this.getSessionId())) {
+        if (object.availableDelete(this.getSessionId()) && !object.isDeleted()) {
             this.getSession().delete(object);
             return true;
         }
@@ -261,7 +261,7 @@ public class BaseService<T extends Domain> {
 
     public boolean deleteById(long id) {
         T object = this.getById(id);
-        if (object != null && object.availableDelete(this.getSessionId())) {
+        if (object != null && object.availableDelete(this.getSessionId()) && !object.isDeleted()) {
             this.delete(object);
             return true;
         }

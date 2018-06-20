@@ -7,6 +7,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Helper class for converting Date from undefined format to long number
+ * Check this at {@link database.domains.DomainWithAuthor}
+ */
 public class DateHelper {
     private static final Map<String, String> DATETIME_FORMATS = new HashMap<String, String>() {{
         put("^\\d{8}$", "yyyyMMdd");

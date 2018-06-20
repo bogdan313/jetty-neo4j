@@ -11,6 +11,10 @@ import services.AuthenticationServiceSingleton;
 
 import java.text.ParseException;
 
+/**
+ * Base class for domains, but have parameters for storing author, created date and time, who was edited record and
+ * editing date and time
+ */
 @NodeEntity
 public class DomainWithAuthor extends Domain {
     @Relationship(type = CreatedByRelationship.TYPE, direction = Relationship.OUTGOING)

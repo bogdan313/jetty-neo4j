@@ -2,6 +2,9 @@ package helpers;
 
 import com.google.gson.GsonBuilder;
 
+/**
+ * Helper class for convert any object with annotated @Expose fields to JSON string
+ */
 public class GsonHelper {
     private Object object;
 

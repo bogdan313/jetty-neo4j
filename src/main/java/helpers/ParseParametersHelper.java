@@ -2,17 +2,26 @@ package helpers;
 
 import com.sun.istack.internal.NotNull;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Helper class for parsing parameters from HttpServletRequest provided by Servlet to Map
+ */
 public class ParseParametersHelper {
     private static final String NO_PARAMETERS = "^(?<parentParameter>\\w+)$";
     private static final String ONE_PARAMETER = "^(?<parentParameter>\\w+)\\[(?<parameterOne>\\w+)\\]$";
     private static final String TWO_PARAMETERS = "^(?<parentParameter>\\w+)\\[(?<parameterOne>\\w+)\\]\\[(?<parameterTwo>\\w+)\\]$";
     private static final String THREE_PARAMETERS = "^(?<parentParameter>\\w+)\\[(?<parameterOne>\\w+)\\]\\[(?<parameterTwo>\\w+)\\]\\[(?<parameterThree>\\w+)\\]$";
 
+    /**
+     * Converts parameters, which looks like "array[index_one][index_two][index_three]" to Map which contain every key
+     * @param parameters from {@link HttpServletRequest#getParameterMap()}
+     * @return Map with parameters
+     */
     @SuppressWarnings("unchecked")
     public static Map<String, Object> parse(@NotNull Map<String, String[]> parameters) {
         Map<String, Object> result = new LinkedHashMap<>();

@@ -6,6 +6,10 @@ import org.neo4j.ogm.annotation.Index;
 import org.neo4j.ogm.annotation.NodeEntity;
 import services.AuthenticationServiceSingleton;
 
+/**
+ * Example class for users
+ * Contains base roles enumeration
+ */
 @NodeEntity
 public class Person extends Domain {
     public enum ROLE {
@@ -53,6 +57,7 @@ public class Person extends Domain {
         return this.password;
     }
     public void setPassword(@NotNull String password) {
+        //TODO: Make password more secure with salt and etc.
         this.password = password;
     }
 

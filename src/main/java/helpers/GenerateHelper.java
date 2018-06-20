@@ -2,6 +2,9 @@ package helpers;
 
 import java.util.Random;
 
+/**
+ * Helper class for generate random string with defined length or some number (integer or double)
+ */
 public class GenerateHelper {
     public static String generateString(int length) {
         if (length < 1) return "";

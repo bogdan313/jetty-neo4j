@@ -1,5 +1,8 @@
 package helpers;
 
+/**
+ * Helper class for defining some constants, which often uses in project
+ */
 public class Constants {
     public static final String CONTENT_TYPE_JSON = "application/json;charset=utf8";
     public static final int ELEMENTS_PER_PAGE = 10;
