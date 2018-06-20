@@ -1,6 +1,7 @@
 package database.domains;
 
 import com.google.gson.annotations.Expose;
+import com.sun.istack.internal.NotNull;
 import org.neo4j.ogm.annotation.Index;
 import org.neo4j.ogm.annotation.NodeEntity;
 import services.AuthenticationServiceSingleton;
@@ -37,22 +38,37 @@ public class Person extends Domain {
     public String getFullName() {
         return this.fullName;
     }
+    public void setFullName(@NotNull String fullName) {
+        this.fullName = fullName;
+    }
+
     public String getLogin() {
         return this.login;
     }
+    public void setLogin(@NotNull String login) {
+        this.login = login;
+    }
+
     public String getPassword() {
         return this.password;
     }
+    public void setPassword(@NotNull String password) {
+        this.password = password;
+    }
+
     public String getRole() {
         return  this.role;
     }
-    public String getPhoto() { return this.photo; }
+    public void setRole(@NotNull String role) {
+        this.role = role;
+    }
 
-    public void setFullName(String fullName) { this.fullName = fullName; }
-    public void setLogin(String login) { this.login = login; }
-    public void setPassword(String password) { this.password = password; }
-    public void setRole(String role) { this.role = role; }
-    public void setPhoto(String photo) { this.photo = photo; }
+    public String getPhoto() {
+        return this.photo;
+    }
+    public void setPhoto(@NotNull String photo) {
+        this.photo = photo;
+    }
 
     @Override
     public boolean availableCreate(String sessionId) {
@@ -65,13 +81,13 @@ public class Person extends Domain {
     }
 
     @Override
-    public boolean availableEdit(String sessionId) {
+    public boolean availableEdit(@NotNull String sessionId) {
         Person currentPerson = AuthenticationServiceSingleton.getInstance().getCurrentPerson(sessionId);
         return currentPerson != null && currentPerson.equals(this);
     }
 
     @Override
-    public boolean availableDelete(String sessionId) {
+    public boolean availableDelete(@NotNull String sessionId) {
         Person currentPerson = AuthenticationServiceSingleton.getInstance().getCurrentPerson(sessionId);
         return currentPerson != null && currentPerson.equals(this);
     }

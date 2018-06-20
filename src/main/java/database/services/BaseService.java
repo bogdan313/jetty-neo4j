@@ -1,5 +1,6 @@
 package database.services;
 
+import com.sun.istack.internal.NotNull;
 import database.DBServiceSingleton;
 import database.domains.Domain;
 import helpers.Constants;
@@ -27,21 +28,21 @@ public class BaseService<T extends Domain> {
         this.clazz = clazz;
     }
 
-    public void setSession(Session session) {
+    public void setSession(@NotNull Session session) {
         this.session = session;
     }
     public Session getSession() {
         return this.session;
     }
 
-    public void setSessionId(String sessionId) {
+    public void setSessionId(@NotNull String sessionId) {
         this.sessionId = sessionId;
     }
     public String getSessionId() {
         return this.sessionId;
     }
 
-    public boolean save(T object) {
+    public boolean save(@NotNull T object) {
         if (object.getId() != null && object.availableEdit(this.getSessionId()) ||
                 object.getId() == null && object.availableCreate(this.getSessionId())) {
             this.getSession().save(object);
@@ -55,7 +56,7 @@ public class BaseService<T extends Domain> {
     }
 
     @SuppressWarnings("unchecked")
-    public Collection<T> getAll(Map<String, String[]> requestParameters) {
+    public Collection<T> getAll(@NotNull Map<String, String[]> requestParameters) {
         Map<String, Object> parsedParameters = ParseParametersHelper.parse(requestParameters);
         Filters filters = new Filters();
         SortOrder sortOrder = new SortOrder();
@@ -152,27 +153,27 @@ public class BaseService<T extends Domain> {
         return this.getAll(new SortOrder().add("id"), page, depth);
     }
 
-    public Collection<T> getAll(SortOrder order) {
+    public Collection<T> getAll(@NotNull SortOrder order) {
         return this.getAll(order, -1, 1);
     }
 
-    public Collection<T> getAll(SortOrder order, int page) {
+    public Collection<T> getAll(@NotNull SortOrder order, int page) {
         return this.getAll(order, page, 1);
     }
 
-    public Collection<T> getAll(SortOrder order, int page, int depth) {
+    public Collection<T> getAll(@NotNull SortOrder order, int page, int depth) {
         return this.getAll(new Filters(), order, page, depth);
     }
 
-    public Collection<T> getAll(Filter filter, SortOrder sortOrder, int page, int depth) {
+    public Collection<T> getAll(@NotNull Filter filter, @NotNull SortOrder sortOrder, int page, int depth) {
         return this.getAll(new Filters().add(filter), sortOrder, page, depth);
     }
 
-    public Collection<T> getAll(Filters filters, SortOrder sortOrder, int page, int depth) {
+    public Collection<T> getAll(@NotNull Filters filters, @NotNull SortOrder sortOrder, int page, int depth) {
         return this.getAll(filters, sortOrder, page, Constants.ELEMENTS_PER_PAGE, depth);
     }
 
-    public Collection<T> getAll(Filters filters, SortOrder sortOrder, int pageNumber, int pageSize, int depth) {
+    public Collection<T> getAll(@NotNull Filters filters, @NotNull SortOrder sortOrder, int pageNumber, int pageSize, int depth) {
         Collection<T> result = null;
         if (pageNumber == -1) result = this.getSession().loadAll(this.clazz, filters, sortOrder, depth);
         else result = this.getSession().loadAll(this.clazz, filters, sortOrder, new Pagination(pageNumber - 1, pageSize), depth);
@@ -193,11 +194,11 @@ public class BaseService<T extends Domain> {
         return object.availableRead(this.getSessionId()) ? object : null;
     }
 
-    public T getOneByFilter(Filter filter) {
+    public T getOneByFilter(@NotNull Filter filter) {
         return this.getOneByFilter(new Filters().add(filter));
     }
 
-    public T getOneByFilter(Filters filters) {
+    public T getOneByFilter(@NotNull Filters filters) {
         Collection<T> collection = this.getSession().loadAll(this.clazz, filters);
         Optional<T> object = collection.stream().findFirst();
         if (object.isPresent()) {
@@ -207,30 +208,30 @@ public class BaseService<T extends Domain> {
         return null;
     }
 
-    public Collection<T> getByFilter(Filter filter) {
+    public Collection<T> getByFilter(@NotNull Filter filter) {
         return this.getByFilter(new Filters().add(filter));
     }
 
-    public Collection<T> getByFilter(Filters filters) {
+    public Collection<T> getByFilter(@NotNull Filters filters) {
         return this.getByFilter(filters, 1);
     }
 
-    public Collection<T> getByFilter(Filters filters, int depth) {
+    public Collection<T> getByFilter(@NotNull Filters filters, int depth) {
         Collection<T> result = this.getSession().loadAll(this.clazz, filters, depth);
         result.removeIf(item -> item.availableRead(this.getSessionId()));
         result.forEach(item -> item.setAvailability(this.getSessionId()));
         return result;
     }
 
-    public boolean isExists(String parameter, Object value) {
+    public boolean isExists(@NotNull String parameter, @NotNull Object value) {
         return this.isExists(new Filter(parameter, ComparisonOperator.EQUALS, value));
     }
 
-    public boolean isExists(Filter filter) {
+    public boolean isExists(@NotNull Filter filter) {
         return this.isExists(new Filters().add(filter));
     }
 
-    public boolean isExists(Filters filters) {
+    public boolean isExists(@NotNull Filters filters) {
         return this.getSession().count(this.clazz, filters) > 0;
     }
 
@@ -238,19 +239,19 @@ public class BaseService<T extends Domain> {
         return this.getSession().countEntitiesOfType(this.clazz);
     }
 
-    public long count(String parameter, Object value) {
+    public long count(@NotNull String parameter, @NotNull Object value) {
         return this.count(new Filter(parameter, ComparisonOperator.EQUALS, value));
     }
 
-    public long count(Filter filter) {
+    public long count(@NotNull Filter filter) {
         return this.count(new Filters().add(filter));
     }
 
-    public long count(Filters filters) {
+    public long count(@NotNull Filters filters) {
         return this.getSession().count(this.clazz, filters);
     }
 
-    public boolean delete(T object) {
+    public boolean delete(@NotNull T object) {
         if (object.availableDelete(this.getSessionId())) {
             this.getSession().delete(object);
             return true;

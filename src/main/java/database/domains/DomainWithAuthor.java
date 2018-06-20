@@ -1,6 +1,7 @@
 package database.domains;
 
 import com.google.gson.annotations.Expose;
+import com.sun.istack.internal.NotNull;
 import database.relationships.CreatedByRelationship;
 import database.relationships.UpdatedByRelationship;
 import helpers.DateHelper;
@@ -22,12 +23,12 @@ public class DomainWithAuthor extends Domain {
     public Person getCreatedBy() {
         return this.createdBy;
     }
-    public void setCreatedBy(Person createdBy) { this.createdBy = createdBy; }
+    public void setCreatedBy(@NotNull Person createdBy) { this.createdBy = createdBy; }
 
     public Person getUpdatedBy() {
         return this.updatedBy;
     }
-    public void setUpdatedBy(Person updatedBy) {
+    public void setUpdatedBy(@NotNull Person updatedBy) {
         this.updatedBy = updatedBy;
     }
 
@@ -37,16 +38,19 @@ public class DomainWithAuthor extends Domain {
     public void setCreatedDate(long createdDate) {
         this.createdDate = createdDate;
     }
-    public void setCreatedDate(String createdDate) {
-        try {
-            this.createdDate = DateHelper.parse(createdDate);
-        }
-        catch (ParseException exception) {
-            this.createdDate = System.currentTimeMillis();
-        }
+    public void setCreatedDate(@NotNull String createdDate) throws ParseException {
+        this.createdDate = DateHelper.parse(createdDate);
     }
     public void setCreatedDate() {
         this.createdDate = System.currentTimeMillis();
+    }
+    public void setCreatedDateOrCurrent(String createdDate) {
+        try {
+            this.setCreatedDate(createdDate);
+        }
+        catch (ParseException e) {
+            this.setCreatedDate();
+        }
     }
 
     public long getUpdatedDate() {
@@ -55,16 +59,19 @@ public class DomainWithAuthor extends Domain {
     public void setUpdatedDate(long updatedDate) {
         this.updatedDate = updatedDate;
     }
-    public void setUpdatedDate(String updatedDate) {
-        try {
-            this.updatedDate = DateHelper.parse(updatedDate);
-        }
-        catch (ParseException exception) {
-            this.updatedDate = System.currentTimeMillis();
-        }
+    public void setUpdatedDate(@NotNull String updatedDate) throws ParseException {
+        this.setUpdatedDate(DateHelper.parse(updatedDate));
     }
     public void setUpdatedDate() {
         this.updatedDate = System.currentTimeMillis();
+    }
+    public void setUpdatedDateOrCurrent(String updatedDate) {
+        try {
+            this.setUpdatedDate(updatedDate);
+        }
+        catch (ParseException e) {
+            this.setUpdatedDate();
+        }
     }
 
     @Override
@@ -78,14 +85,14 @@ public class DomainWithAuthor extends Domain {
     }
 
     @Override
-    public boolean availableEdit(String sessionId) {
+    public boolean availableEdit(@NotNull String sessionId) {
         Person currentPerson = AuthenticationServiceSingleton.getInstance().getCurrentPerson(sessionId);
         if (currentPerson == null) return false;
         return this.getCreatedBy() != null && this.getCreatedBy().equals(currentPerson);
     }
 
     @Override
-    public boolean availableDelete(String sessionId) {
+    public boolean availableDelete(@NotNull String sessionId) {
         Person currentPerson = AuthenticationServiceSingleton.getInstance().getCurrentPerson(sessionId);
         if (currentPerson == null) return false;
         return this.getCreatedBy() != null && this.getCreatedBy().equals(currentPerson);

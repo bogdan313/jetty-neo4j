@@ -1,5 +1,7 @@
 package helpers;
 
+import com.sun.istack.internal.NotNull;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -12,7 +14,7 @@ public class ParseParametersHelper {
     private static final String THREE_PARAMETERS = "^(?<parentParameter>\\w+)\\[(?<parameterOne>\\w+)\\]\\[(?<parameterTwo>\\w+)\\]\\[(?<parameterThree>\\w+)\\]$";
 
     @SuppressWarnings("unchecked")
-    public static Map<String, Object> parse(Map<String, String[]> parameters) {
+    public static Map<String, Object> parse(@NotNull Map<String, String[]> parameters) {
         Map<String, Object> result = new LinkedHashMap<>();
         Pattern noParametersPattern = Pattern.compile(ParseParametersHelper.NO_PARAMETERS);
         Pattern oneParameterPattern = Pattern.compile(ParseParametersHelper.ONE_PARAMETER);
