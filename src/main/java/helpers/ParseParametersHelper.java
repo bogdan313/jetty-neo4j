@@ -1,7 +1,5 @@
 package helpers;
 
-import com.sun.istack.internal.NotNull;
-
 import javax.servlet.http.HttpServletRequest;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -23,7 +21,9 @@ public class ParseParametersHelper {
      * @return Map with parameters
      */
     @SuppressWarnings("unchecked")
-    public static Map<String, Object> parse(@NotNull Map<String, String[]> parameters) {
+    public static Map<String, Object> parse(Map<String, String[]> parameters) {
+        if (parameters == null) throw new IllegalArgumentException("parameters must be specified");
+
         Map<String, Object> result = new LinkedHashMap<>();
         Pattern noParametersPattern = Pattern.compile(ParseParametersHelper.NO_PARAMETERS);
         Pattern oneParameterPattern = Pattern.compile(ParseParametersHelper.ONE_PARAMETER);

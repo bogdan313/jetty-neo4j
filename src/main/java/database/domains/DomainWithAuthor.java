@@ -1,7 +1,6 @@
 package database.domains;
 
 import com.google.gson.annotations.Expose;
-import com.sun.istack.internal.NotNull;
 import database.relationships.CreatedByRelationship;
 import database.relationships.UpdatedByRelationship;
 import helpers.DateHelper;
@@ -27,12 +26,12 @@ public class DomainWithAuthor extends Domain {
     public Person getCreatedBy() {
         return this.createdBy;
     }
-    public void setCreatedBy(@NotNull Person createdBy) { this.createdBy = createdBy; }
+    public void setCreatedBy(Person createdBy) { this.createdBy = createdBy; }
 
     public Person getUpdatedBy() {
         return this.updatedBy;
     }
-    public void setUpdatedBy(@NotNull Person updatedBy) {
+    public void setUpdatedBy(Person updatedBy) {
         this.updatedBy = updatedBy;
     }
 
@@ -42,7 +41,7 @@ public class DomainWithAuthor extends Domain {
     public void setCreatedDate(long createdDate) {
         this.createdDate = createdDate;
     }
-    public void setCreatedDate(@NotNull String createdDate) throws ParseException {
+    public void setCreatedDate(String createdDate) throws ParseException {
         this.createdDate = DateHelper.parse(createdDate);
     }
     public void setCreatedDate() {
@@ -63,7 +62,7 @@ public class DomainWithAuthor extends Domain {
     public void setUpdatedDate(long updatedDate) {
         this.updatedDate = updatedDate;
     }
-    public void setUpdatedDate(@NotNull String updatedDate) throws ParseException {
+    public void setUpdatedDate(String updatedDate) throws ParseException {
         this.setUpdatedDate(DateHelper.parse(updatedDate));
     }
     public void setUpdatedDate() {
@@ -89,14 +88,14 @@ public class DomainWithAuthor extends Domain {
     }
 
     @Override
-    public boolean availableEdit(@NotNull String sessionId) {
+    public boolean availableEdit(String sessionId) {
         Person currentPerson = AuthenticationServiceSingleton.getInstance().getCurrentPerson(sessionId);
         if (currentPerson == null) return false;
         return this.getCreatedBy() != null && this.getCreatedBy().equals(currentPerson);
     }
 
     @Override
-    public boolean availableDelete(@NotNull String sessionId) {
+    public boolean availableDelete(String sessionId) {
         Person currentPerson = AuthenticationServiceSingleton.getInstance().getCurrentPerson(sessionId);
         if (currentPerson == null) return false;
         return this.getCreatedBy() != null && this.getCreatedBy().equals(currentPerson);

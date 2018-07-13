@@ -1,7 +1,6 @@
 package database.domains;
 
 import com.google.gson.annotations.Expose;
-import com.sun.istack.internal.NotNull;
 import org.neo4j.ogm.annotation.GeneratedValue;
 import org.neo4j.ogm.annotation.Id;
 import org.neo4j.ogm.annotation.NodeEntity;
@@ -66,29 +65,50 @@ public class Domain {
     }
 
     public Map<String, Object> getProperties() { return this.properties; }
-    public void setProperty(@NotNull String key, @NotNull Object value) { this.getProperties().put(key, value); }
-    public Object getProperty(@NotNull String key) { return this.getProperties().get(key); }
-    public void deleteProperty(@NotNull String key) { this.getProperties().remove(key); }
-    public boolean hasProperty(@NotNull String key) { return this.getProperties().containsKey(key); }
-    public boolean hasPropertyObject(@NotNull Object object) { return this.getProperties().containsValue(object); }
+    public void setProperty(String key, Object value) {
+        if (key == null || key.trim().isEmpty()) throw new IllegalArgumentException("key must be specified");
 
-    public boolean hasAttribute(@NotNull String attribute) {
+        this.getProperties().put(key, value);
+    }
+    public Object getProperty(String key) {
+        return this.hasProperty(key) ? this.getProperties().get(key) : null;
+    }
+    public void deleteProperty(String key) {
+        if (this.hasProperty(key))
+            this.getProperties().remove(key);
+    }
+    public boolean hasProperty(String key) {
+        return (key != null && !key.trim().isEmpty()) && this.getProperties().containsKey(key);
+    }
+    public boolean hasPropertyObject(Object object) {
+        return object != null && this.getProperties().containsValue(object);
+    }
+
+    public boolean hasAttribute(String attribute) {
+        if (attribute == null || attribute.trim().isEmpty()) throw new IllegalArgumentException("attribute must be specified");
+
         List<Field> fields = new ArrayList<>();
         Domain.getAllFields(fields, this.getClass());
         return fields.stream().anyMatch(item -> item.getName().equals(attribute));
     }
-    public Class<?> getAttributeType(@NotNull String attribute) {
+    public Class<?> getAttributeType(String attribute) {
+        if (attribute == null || attribute.trim().isEmpty()) throw new IllegalArgumentException("attribute must be specified");
+
         List<Field> fields = new ArrayList<>();
         Domain.getAllFields(fields, this.getClass());
         Field field = fields.stream().filter(item -> item.getName().equals(attribute)).findFirst().orElse(null);
         return field != null ? field.getType() : null;
     }
-    public void setAttribute(@NotNull String attribute, @NotNull Object value) throws NoSuchFieldException, IllegalAccessException {
+    public void setAttribute(String attribute, Object value) throws NoSuchFieldException, IllegalAccessException {
+        if (attribute == null || attribute.trim().isEmpty()) throw new IllegalArgumentException("attribute must be specified");
+
         Field field = this.getClass().getField(attribute);
         field.setAccessible(true);
         field.set(this, value);
     }
-    public void setAttributes(@NotNull Map<String, Object> attributes) {
+    public void setAttributes(Map<String, Object> attributes) {
+        if (attributes == null) return;
+
         attributes.forEach((key, value) -> {
             if (this.hasAttribute(key)) {
                 try {
@@ -99,31 +119,31 @@ public class Domain {
         });
     }
 
-    public boolean availableCreate(@NotNull String sessionId) {
+    public boolean availableCreate(String sessionId) {
         return false;
     }
-    public boolean availableRead(@NotNull String sessionId) {
+    public boolean availableRead(String sessionId) {
         return false;
     }
-    public boolean availableEdit(@NotNull String sessionId) {
+    public boolean availableEdit(String sessionId) {
         return false;
     }
-    public boolean availableDelete(@NotNull String sessionId) {
+    public boolean availableDelete(String sessionId) {
         return false;
     }
 
-    public void setAvailability(@NotNull String sessionId) {
+    public void setAvailability(String sessionId) {
         this.setReadable(this.availableRead(sessionId));
         this.setEditable(this.availableEdit(sessionId));
         this.setDeletable(this.availableDelete(sessionId));
     }
 
-    private static List<Field> getAllFields(@NotNull Class<?> clazz) {
+    private static List<Field> getAllFields(Class<?> clazz) {
         List<Field> result = new ArrayList<>();
         Domain.getAllFields(result, clazz);
         return result;
     }
-    private static void getAllFields(@NotNull List<Field> oldFields, @NotNull Class<?> clazz) {
+    private static void getAllFields(List<Field> oldFields, Class<?> clazz) {
         if (!Domain.class.isAssignableFrom(clazz)) return;
         oldFields.addAll(Arrays.asList(clazz.getDeclaredFields()));
 
@@ -131,7 +151,7 @@ public class Domain {
             Domain.getAllFields(oldFields, clazz.getSuperclass());
     }
 
-    public boolean equals(@NotNull Domain domain) {
+    public boolean equals(Domain domain) {
         return this.getId() != null && domain.getId() != null && this.getId().equals(domain.getId());
     }
 

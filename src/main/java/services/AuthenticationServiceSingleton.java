@@ -1,6 +1,5 @@
 package services;
 
-import com.sun.istack.internal.NotNull;
 import database.domains.Person;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -16,26 +15,27 @@ public class AuthenticationServiceSingleton {
         return AuthenticationServiceSingleton.authenticationServiceSingleton;
     }
 
-    public boolean isAuthenticated(@NotNull String sessionId) {
-        return !sessionId.isEmpty() && this.authenticatedPersons.containsKey(sessionId);
+    public boolean isAuthenticated(String sessionId) {
+        return sessionId != null && !sessionId.isEmpty() && this.authenticatedPersons.containsKey(sessionId);
     }
 
-    public Person getCurrentPerson(@NotNull String sessionId) {
+    public Person getCurrentPerson(String sessionId) {
         return this.isAuthenticated(sessionId)
                 ? this.authenticatedPersons.get(sessionId)
                 : null;
     }
 
-    boolean signInPerson(@NotNull String sessionId, @NotNull Person person) {
+    boolean signInPerson(String sessionId, Person person) {
         //TODO: Implement check for this Person is already authenticated
-        if (sessionId.trim().isEmpty()) return false;
+        if (sessionId == null || sessionId.trim().isEmpty()) return false;
 
         this.authenticatedPersons.put(sessionId, person);
         return true;
     }
 
-    boolean logoutPerson(@NotNull String sessionId) {
+    boolean logoutPerson(String sessionId) {
         if (sessionId == null || sessionId.trim().isEmpty()) return false;
+
         if (this.authenticatedPersons.containsKey(sessionId)) {
             this.authenticatedPersons.remove(sessionId);
             return true;

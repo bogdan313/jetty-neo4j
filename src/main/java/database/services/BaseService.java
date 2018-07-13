@@ -1,6 +1,5 @@
 package database.services;
 
-import com.sun.istack.internal.NotNull;
 import database.DBServiceSingleton;
 import database.domains.Domain;
 import helpers.Constants;
@@ -41,18 +40,21 @@ public class BaseService<T extends Domain> {
     private String sessionId;
 
     BaseService(Class<T> clazz) {
+        if (clazz == null) throw new IllegalArgumentException("Clazz must be specified");
+
         this.session = DBServiceSingleton.getInstance().getSession();
         this.clazz = clazz;
     }
 
-    public void setSession(@NotNull Session session) {
+    public void setSession(Session session) {
+        if (session == null) throw new IllegalArgumentException("Session must be not null");
         this.session = session;
     }
     public Session getSession() {
         return this.session;
     }
 
-    public void setSessionId(@NotNull String sessionId) {
+    public void setSessionId(String sessionId) {
         this.sessionId = sessionId;
     }
     public String getSessionId() {
@@ -64,7 +66,7 @@ public class BaseService<T extends Domain> {
      * @param object of T (Domain) class which should be stored
      * @return is operation success
      */
-    public boolean save(@NotNull T object) {
+    public boolean save(T object) {
         if (object.getId() != null && object.availableEdit(this.getSessionId()) ||
                 object.getId() == null && object.availableCreate(this.getSessionId())) {
             this.getSession().save(object);
@@ -88,7 +90,9 @@ public class BaseService<T extends Domain> {
      * @return collection of records
      */
     @SuppressWarnings("unchecked")
-    public Collection<T> getAll(@NotNull Map<String, String[]> requestParameters) {
+    public Collection<T> getAll(Map<String, String[]> requestParameters) {
+        if (requestParameters == null) throw new IllegalArgumentException("requestParamters must not be null");
+
         Map<String, Object> parsedParameters = ParseParametersHelper.parse(requestParameters);
         Filters filters = new Filters();
         SortOrder sortOrder = new SortOrder();
@@ -179,7 +183,7 @@ public class BaseService<T extends Domain> {
 
     /**
      * Get all records only by page
-     * @param page
+     * @param page -1 or greater than 0
      * @return collection of records
      */
     public Collection<T> getAll(int page) {
@@ -188,8 +192,8 @@ public class BaseService<T extends Domain> {
 
     /**
      * Get all records by page and with depth (level of loaded relations)
-     * @param page
-     * @param depth means distance to neighbours
+     * @param page -1 or greater than 0
+     * @param depth means distance to neighbours (greater or equals -1)
      * @return collection of records
      */
     public Collection<T> getAll(int page, int depth) {
@@ -198,68 +202,74 @@ public class BaseService<T extends Domain> {
 
     /**
      * Get all sorted records
-     * @param order
+     * @param order {@link SortOrder}
      * @return collection of records
      */
-    public Collection<T> getAll(@NotNull SortOrder order) {
+    public Collection<T> getAll(SortOrder order) {
         return this.getAll(order, -1, 1);
     }
 
     /**
      * Get all ordered records from page
-     * @param order
-     * @param page
+     * @param order {@link SortOrder}
+     * @param page -1 or greater than 0
      * @return collection of records
      */
-    public Collection<T> getAll(@NotNull SortOrder order, int page) {
+    public Collection<T> getAll(SortOrder order, int page) {
         return this.getAll(order, page, 1);
     }
 
     /**
      * Get all ordered records from page and with neighbours (depth)
-     * @param order
-     * @param page
-     * @param depth
+     * @param order {@link SortOrder}
+     * @param page -1 or greater than 0
+     * @param depth means distance to neighbours (greater or equals -1)
      * @return collection of records
      */
-    public Collection<T> getAll(@NotNull SortOrder order, int page, int depth) {
+    public Collection<T> getAll(SortOrder order, int page, int depth) {
         return this.getAll(new Filters(), order, page, depth);
     }
 
     /**
      * Get all ordered records with filter condition from page and with neighbours (depth)
-     * @param filter
-     * @param sortOrder
-     * @param page
-     * @param depth
+     * @param filter {@link Filter}
+     * @param sortOrder {@link SortOrder}
+     * @param page -1 or greater than 0
+     * @param depth means distance to neighbours (greater or equals -1)
      * @return collection of records
      */
-    public Collection<T> getAll(@NotNull Filter filter, @NotNull SortOrder sortOrder, int page, int depth) {
+    public Collection<T> getAll(Filter filter, SortOrder sortOrder, int page, int depth) {
         return this.getAll(new Filters().add(filter), sortOrder, page, depth);
     }
 
     /**
      * Get all ordered records with filters condition from page and with neighbours (depth)
-     * @param filters
-     * @param sortOrder
-     * @param page
-     * @param depth
+     * @param filters {@link Filters}
+     * @param sortOrder {@link SortOrder}
+     * @param page -1 or greater than 0
+     * @param depth means distance to neighbours (greater or equals -1)
      * @return collection of records
      */
-    public Collection<T> getAll(@NotNull Filters filters, @NotNull SortOrder sortOrder, int page, int depth) {
+    public Collection<T> getAll(Filters filters, SortOrder sortOrder, int page, int depth) {
         return this.getAll(filters, sortOrder, page, Constants.ELEMENTS_PER_PAGE, depth);
     }
 
     /**
      * Get all records with condition of all available parameters: filtered, sorted, from page and count of records, with neighbours
-     * @param filters
-     * @param sortOrder
-     * @param pageNumber
-     * @param pageSize
-     * @param depth
+     * @param filters {@link Filters}
+     * @param sortOrder {@link SortOrder}
+     * @param pageNumber -1 or greater than 0
+     * @param pageSize greater than 0
+     * @param depth means distance to neighbours (greater or equals -1)
      * @return collection of records
      */
-    public Collection<T> getAll(@NotNull Filters filters, @NotNull SortOrder sortOrder, int pageNumber, int pageSize, int depth) {
+    public Collection<T> getAll(Filters filters, SortOrder sortOrder, int pageNumber, int pageSize, int depth) {
+        if (filters == null) throw new IllegalArgumentException("filters must be not null");
+        if (sortOrder == null) throw new IllegalArgumentException("sortOrder must be not null");
+        if (pageNumber < -1 || pageNumber == 0) throw new IllegalArgumentException("pageNumber must be greater than 0 or -1");
+        if (pageSize < 1) throw new IllegalArgumentException("pageSize must be greater than 0");
+        if (depth < -1) throw new IllegalArgumentException("depth must be greater or equals -1");
+
         Collection<T> result = null;
         if (pageNumber == -1) result = this.getSession().loadAll(this.clazz, filters, sortOrder, depth);
         else result = this.getSession().loadAll(this.clazz, filters, sortOrder, new Pagination(pageNumber - 1, pageSize), depth);
@@ -272,7 +282,7 @@ public class BaseService<T extends Domain> {
 
     /**
      * Get one record by ID
-     * @param id
+     * @param id long
      * @return T object
      */
     public T getById(long id) {
@@ -281,8 +291,8 @@ public class BaseService<T extends Domain> {
 
     /**
      * Get one record with neighbours (depth)
-     * @param id
-     * @param depth
+     * @param id long
+     * @param depth means distance to neighbours (greater or equals -1)
      * @return T object
      */
     public T getById(long id, int depth) {
@@ -293,19 +303,19 @@ public class BaseService<T extends Domain> {
 
     /**
      * Get one record with filter condition
-     * @param filter
+     * @param filter {@link Filter}
      * @return T object
      */
-    public T getOneByFilter(@NotNull Filter filter) {
+    public T getOneByFilter(Filter filter) {
         return this.getOneByFilter(new Filters().add(filter));
     }
 
     /**
      * Get one record with filters condition
-     * @param filters
+     * @param filters {@link Filters}
      * @return T object
      */
-    public T getOneByFilter(@NotNull Filters filters) {
+    public T getOneByFilter(Filters filters) {
         Collection<T> collection = this.getSession().loadAll(this.clazz, filters);
         Optional<T> object = collection.stream().findFirst();
         if (object.isPresent()) {
@@ -317,29 +327,29 @@ public class BaseService<T extends Domain> {
 
     /**
      * Get all records with filter condition
-     * @param filter
+     * @param filter {@link Filters}
      * @return collection of records
      */
-    public Collection<T> getByFilter(@NotNull Filter filter) {
+    public Collection<T> getByFilter(Filter filter) {
         return this.getByFilter(new Filters().add(filter));
     }
 
     /**
      * Get all records with filters condition
-     * @param filters
+     * @param filters {@link Filters}
      * @return collection of records
      */
-    public Collection<T> getByFilter(@NotNull Filters filters) {
+    public Collection<T> getByFilter(Filters filters) {
         return this.getByFilter(filters, 1);
     }
 
     /**
      * Get all records with filters condition and with neighbours
-     * @param filters
-     * @param depth
+     * @param filters {@link Filters}
+     * @param depth means distance to neighbours (greater or equals -1)
      * @return collection of records
      */
-    public Collection<T> getByFilter(@NotNull Filters filters, int depth) {
+    public Collection<T> getByFilter(Filters filters, int depth) {
         Collection<T> result = this.getSession().loadAll(this.clazz, filters, depth);
         result.removeIf(item -> item.availableRead(this.getSessionId()));
         result.forEach(item -> item.setAvailability(this.getSessionId()));
@@ -348,29 +358,29 @@ public class BaseService<T extends Domain> {
 
     /**
      * Check is record with this parameter exists
-     * @param parameter
-     * @param value
+     * @param parameter attribute name
+     * @param value attribute value
      * @return is some records exists
      */
-    public boolean isExists(@NotNull String parameter, @NotNull Object value) {
+    public boolean isExists(String parameter, Object value) {
         return this.isExists(new Filter(parameter, ComparisonOperator.EQUALS, value));
     }
 
     /**
      * Check is record with this filter condition exists
-     * @param filter
+     * @param filter {@link Filter}
      * @return is some records exists
      */
-    public boolean isExists(@NotNull Filter filter) {
+    public boolean isExists(Filter filter) {
         return this.isExists(new Filters().add(filter));
     }
 
     /**
      * Check is record with this filters condition exists
-     * @param filters
+     * @param filters {@link Filters}
      * @return is some records exists
      */
-    public boolean isExists(@NotNull Filters filters) {
+    public boolean isExists(Filters filters) {
         return this.getSession().count(this.clazz, filters) > 0;
     }
 
@@ -384,38 +394,38 @@ public class BaseService<T extends Domain> {
 
     /**
      * Count how many records fits parameter condition
-     * @param parameter
-     * @param value
+     * @param parameter attribute name
+     * @param value attribute value
      * @return number of records
      */
-    public long count(@NotNull String parameter, @NotNull Object value) {
+    public long count(String parameter, Object value) {
         return this.count(new Filter(parameter, ComparisonOperator.EQUALS, value));
     }
 
     /**
      * Count how many records fits filter
-     * @param filter
+     * @param filter {@link Filter}
      * @return number of records
      */
-    public long count(@NotNull Filter filter) {
+    public long count(Filter filter) {
         return this.count(new Filters().add(filter));
     }
 
     /**
      * Count how many records fits filters
-     * @param filters
+     * @param filters {@link Filters}
      * @return number of records
      */
-    public long count(@NotNull Filters filters) {
+    public long count(Filters filters) {
         return this.getSession().count(this.clazz, filters);
     }
 
     /**
      * Delete object from database
-     * @param object
+     * @param object T object which should be deleted
      * @return is available to delete object and if is deleted
      */
-    public boolean delete(@NotNull T object) {
+    public boolean delete(T object) {
         if (object.availableDelete(this.getSessionId()) && !object.isDeleted()) {
             this.getSession().delete(object);
             return true;
@@ -425,7 +435,7 @@ public class BaseService<T extends Domain> {
 
     /**
      * Find object by ID and delete it
-     * @param id
+     * @param id long
      * @return is available to delete object and if is deleted
      */
     public boolean deleteById(long id) {
