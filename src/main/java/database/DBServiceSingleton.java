@@ -10,16 +10,15 @@ import org.neo4j.ogm.session.SessionFactory;
  */
 public class DBServiceSingleton {
     private final static DBServiceSingleton dbServiceSingleton = new DBServiceSingleton();
-    private Configuration configuration;
-    private SessionFactory sessionFactory;
+    private final SessionFactory sessionFactory;
 
     /**
      * Change parameters for your configuration
      */
     private DBServiceSingleton() {
-        this.configuration = new Configuration.Builder()
+        Configuration configuration = new Configuration.Builder()
                 .uri("bolt://localhost:7678")
-                .credentials("root", "12345")
+                .credentials("username", "password")
                 .build();
         this.sessionFactory = new SessionFactory(configuration, "database.domains");
     }

@@ -21,7 +21,6 @@ public class ErrorMessage {
     public static final int RECORD_EXISTS = 4;
     public static final int PERMISSIONS_DENIED = 5;
     public static final int SERVER_ERROR = 6;
-    public static final int INCORRECT_PASSWORD = 7;
 
     public ErrorMessage(int code) {
         this.code = code;
@@ -45,7 +44,6 @@ public class ErrorMessage {
         this.codeMessages.put(4, "Record already exists");
         this.codeMessages.put(5, "Permissions denied");
         this.codeMessages.put(6, "Server error");
-        this.codeMessages.put(7, "Incorrect password");
 
         this.message = this.getCodeMessages().get(this.code);
     }
